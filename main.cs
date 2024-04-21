@@ -3,43 +3,52 @@ using System;
 class Program
 {
     public static void Main(string[] args)
-    {
-      string host = "sql.freedb.tech";
-      string dbName = "freedb_db_aula01";
-      string user = "freedb_aluno";
-      string password = "&ta2Vz@C5?EnXbD";
-      
-      Repository repository = new Repository(host, dbName, user, password);
+    {    // Conexao com banco
+        string conexaoString = "Server=sql.freedb.tech;Database=freedb_db_aula01;Uid=freedb_aluno;Pwd=&ta2Vz@C5?EnXbD;";
+        TimeoutRepository timeoutRepository = new TimeoutRepository(conexaoString);
 
-        RandomTimeoutGenerator generator = RandomTimeoutGenerator.getInstance;
+        timeoutRepository.TestarConexao();
 
+        // instanciando objeto da classe de gerador de timeouts (com Singleton)
 
-        for (int i = 0; i < 5; i++)
-        {
-            int timeout = generator.GetRandomTimeout();
-            Console.WriteLine($"Timeout gerado: {timeout} ms");
-        }
+        TimeoutGeneratorSingleton generator = TimeoutGeneratorSingleton.getInstance;
 
+        // testando Circuit Breaker
+        CircuitBreaker circuitBreaker = new CircuitBreaker(conexaoString);
 
+        Action protectedCode = () => { Console.WriteLine("Calculadora protegida (Circuito fechado)."); };
+        Action onOpen = () => { Console.WriteLine("Circuit Breaker aberto."); };
+        Action onHalfOpen = () => { Console.WriteLine("Circuit Breaker meio-aberto."); };
 
 
-        /*
-          Calculadora calculator = new Calculadora();
+        circuitBreaker.Execute(protectedCode, onOpen, onHalfOpen);
 
-          // Adição
-          calculator.SetCommand(new AdicaoCommand(10, 5));
-          calculator.ExecuteCommand();
+        // Gerador aleatório de Timeouts
+        int timeout = generator.GetRandomTimeout();
+        Console.WriteLine($"Timeout gerado: {timeout} ms");
 
-          //Subtração
-          calculator.SetCommand(new SubtracaoCommand(10, 5));
-          calculator.ExecuteCommand();
 
-         //Multiplicação
-          calculator.SetCommand(new MultiplicacaoCommand(10, 5));
-          calculator.ExecuteCommand();
+        //Implementacao de um gerador de números aleatórios para a calculadora.
+        Random random = new Random();
+        int numero1 = random.Next(1, 100);
+        int numero2 = random.Next(1, 100);
 
-          //Divisão
-          calculator.SetCommand(new DivisaoCommand(10, 5));
-          calculator.ExecuteCommand();*/
+        Calculadora calculator = new Calculadora();
+
+        // Adição
+        calculator.SetCommand(new AdicaoCommand(numero1, numero2));
+        calculator.ExecuteCommand();
+
+        //Subtração
+        calculator.SetCommand(new SubtracaoCommand(numero1, numero2));
+        calculator.ExecuteCommand();
+
+        //Multiplicação
+        calculator.SetCommand(new MultiplicacaoCommand(numero1, numero2));
+        calculator.ExecuteCommand();
+
+        //Divisão
+        calculator.SetCommand(new DivisaoCommand(numero1, numero2));
+        calculator.ExecuteCommand();
     }
 }

@@ -1,21 +1,21 @@
 using System;
-public class RandomTimeoutGenerator
+public class TimeoutGeneratorSingleton
 {
-    private static RandomTimeoutGenerator _instance;
+    private static TimeoutGeneratorSingleton _instance;
     private readonly Random _random;
 
-    private RandomTimeoutGenerator()
+    private TimeoutGeneratorSingleton()
     {
         _random = new Random();
     }
 
-    public static RandomTimeoutGenerator getInstance
+    public static TimeoutGeneratorSingleton getInstance
     {
         get
         {
             if (_instance == null)
             {
-                _instance = new RandomTimeoutGenerator();
+                _instance = new TimeoutGeneratorSingleton();
             }
             return _instance;
         }
