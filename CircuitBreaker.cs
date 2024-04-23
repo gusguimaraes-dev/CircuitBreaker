@@ -21,7 +21,7 @@ class CircuitBreaker
 
     public void ChangeState(ICircuitBreakerState state)
     {
-        _state = state;
+        _state = state;  
     }
 
 }

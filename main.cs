@@ -21,11 +21,28 @@ class Program
         Action onHalfOpen = () => { Console.WriteLine("Circuit Breaker meio-aberto."); };
 
 
-        circuitBreaker.Execute(protectedCode, onOpen, onHalfOpen);
+
 
         // Gerador aleatório de Timeouts
         int timeout = generator.GetRandomTimeout();
         Console.WriteLine($"Timeout gerado: {timeout} ms");
+
+        // Condicionais para testar o Circuit Breaker
+        if (timeout > 5000)
+        {
+            circuitBreaker.ChangeState(new OpenState());
+            onOpen();
+        }
+        else if ((timeout > 1001) && (timeout < 5001))
+        {
+            circuitBreaker.ChangeState(new HalfOpenState());
+            onHalfOpen();
+        }
+        else if (timeout < 1001)
+        {
+            circuitBreaker.ChangeState(new ClosedState());
+            protectedCode();
+        }
 
 
         //Implementacao de um gerador de números aleatórios para a calculadora.
